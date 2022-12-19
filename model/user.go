@@ -11,6 +11,7 @@ type User struct {
 	Email     string          `json:"email"`
 	Username  string          `json:"username"`
 	Score     int             `json:"score"`
+	Cards     []Card          `json:"cards"`
 	CreatedAt time.Time       `json:"created_at"`
 	UpdatedAt time.Time       `json:"updated_at"`
 	DeletedAt *gorm.DeletedAt `json:"-"`

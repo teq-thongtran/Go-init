@@ -6,47 +6,47 @@ import (
 	"net/http"
 )
 
-func ErrUserGet(err error) apperror.TeqError {
+func ErrModelGet(err error) apperror.TeqError {
 	return apperror.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10000",
-		Message:   "Failed to get example.",
+		Message:   "Failed to get card.",
 		IsSentry:  true,
 	}
 }
 
-func ErrUserCreate(err error) apperror.TeqError {
+func ErrModelCreate(err error) apperror.TeqError {
 	return apperror.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10001",
-		Message:   "Failed to create example.",
+		Message:   "Failed to create card.",
 		IsSentry:  true,
 	}
 }
 
-func ErrUserUpdate(err error) apperror.TeqError {
+func ErrModelUpdate(err error) apperror.TeqError {
 	return apperror.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10002",
-		Message:   "Failed to update example.",
+		Message:   "Failed to update card.",
 		IsSentry:  true,
 	}
 }
 
-func ErrUserDelete(err error) apperror.TeqError {
+func ErrModelDelete(err error) apperror.TeqError {
 	return apperror.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10003",
-		Message:   "Failed to delete example.",
+		Message:   "Failed to delete card.",
 		IsSentry:  true,
 	}
 }
 
-func ErrUserNotFound() apperror.TeqError {
+func ErrModelNotFound() apperror.TeqError {
 	return apperror.TeqError{
 		Raw:       nil,
 		HTTPCode:  http.StatusNotFound,
@@ -56,7 +56,7 @@ func ErrUserNotFound() apperror.TeqError {
 	}
 }
 
-func ErrUserInvalidParam(param string) apperror.TeqError {
+func ErrRequestInvalidParam(param string) apperror.TeqError {
 	return apperror.TeqError{
 		Raw:       nil,
 		HTTPCode:  http.StatusBadRequest,
