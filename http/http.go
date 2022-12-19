@@ -7,6 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4/middleware"
 
+	"myapp/http/card"
 	"myapp/http/user"
 	"myapp/usecase"
 )
@@ -42,5 +43,6 @@ func NewHTTPHandler(useCase *usecase.UseCase) *echo.Echo {
 	// APIs
 	api := e.Group("/api")
 	user.Init(api.Group("/users"), useCase)
+	card.Init(api.Group("/cards"), useCase)
 	return e
 }

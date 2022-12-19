@@ -15,39 +15,39 @@ import (
 	"myapp/model"
 )
 
-type IUseCase interface {
+type UserUserCase interface {
 	Create(ctx context.Context, req *payload.CreateUserRequest) (*presenter.UserResponseWrapper, error)
 	Update(ctx context.Context, req *payload.UpdateUserRequest) (*presenter.UserResponseWrapper, error)
 	GetByID(ctx context.Context, req *payload.GetByIDRequest) (*presenter.UserResponseWrapper, error)
-	GetList(ctx context.Context, req *payload.GetListUserRequest) (*presenter.ListUserResponseWrapper, error)
-	Delete(ctx context.Context, req *payload.DeleteUserRequest) error
+	GetList(ctx context.Context, req *payload.GetListRequest) (*presenter.ListUserResponseWrapper, error)
+	Delete(ctx context.Context, req *payload.DeleteRequest) error
 }
 
 func (u *UseCase) validateCreate(req *payload.CreateUserRequest) error {
 	if req.Name == "" {
-		return myerror.ErrUserInvalidParam("name")
+		return myerror.ErrRequestInvalidParam("name")
 	}
 
 	if req.Email == "" {
-		return myerror.ErrUserInvalidParam("Email")
+		return myerror.ErrRequestInvalidParam("Email")
 	}
 
 	if req.Username == "" {
-		return myerror.ErrUserInvalidParam("UserName")
+		return myerror.ErrRequestInvalidParam("UserName")
 	}
 
 	req.Name = strings.TrimSpace(req.Name)
 	if len(req.Name) == 0 {
 		req.Name = ""
-		return myerror.ErrUserInvalidParam("name")
+		return myerror.ErrRequestInvalidParam("name")
 	}
 
 	if len(req.Email) == 0 {
-		return myerror.ErrUserInvalidParam("email")
+		return myerror.ErrRequestInvalidParam("email")
 	}
 
 	if len(req.Username) == 0 {
-		return myerror.ErrUserInvalidParam("username")
+		return myerror.ErrRequestInvalidParam("username")
 	}
 
 	return nil
@@ -70,7 +70,7 @@ func (u *UseCase) Create(
 
 	err := u.UserRepo.Create(ctx, myUser)
 	if err != nil {
-		return nil, myerror.ErrUserCreate(err)
+		return nil, myerror.ErrModelCreate(err)
 	}
 
 	return &presenter.UserResponseWrapper{User: myUser}, nil
@@ -80,16 +80,16 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateUserReq
 	myUser, err := u.UserRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, myerror.ErrUserNotFound()
+			return nil, myerror.ErrModelNotFound()
 		}
 
-		return nil, myerror.ErrUserGet(err)
+		return nil, myerror.ErrModelGet(err)
 	}
 
 	if req.Name != nil {
 		*req.Name = strings.TrimSpace(*req.Name)
 		if len(*req.Name) == 0 {
-			return nil, myerror.ErrUserInvalidParam("name")
+			return nil, myerror.ErrRequestInvalidParam("name")
 		}
 
 		myUser.Name = *req.Name
@@ -98,7 +98,7 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateUserReq
 	if req.Username != nil {
 		*req.Username = strings.TrimSpace(*req.Username)
 		if len(*req.Username) == 0 {
-			return nil, myerror.ErrUserInvalidParam("Username")
+			return nil, myerror.ErrRequestInvalidParam("Username")
 		}
 
 		myUser.Username = *req.Username
@@ -107,7 +107,7 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateUserReq
 	if req.Email != nil {
 		*req.Email = strings.TrimSpace(*req.Email)
 		if len(*req.Email) == 0 {
-			return nil, myerror.ErrUserInvalidParam("Email")
+			return nil, myerror.ErrRequestInvalidParam("Email")
 		}
 
 		myUser.Email = *req.Email
@@ -131,25 +131,25 @@ func (u *UseCase) Update(
 
 	err = u.UserRepo.Update(ctx, myUser)
 	if err != nil {
-		return nil, myerror.ErrUserUpdate(err)
+		return nil, myerror.ErrModelUpdate(err)
 	}
 
 	return &presenter.UserResponseWrapper{User: myUser}, nil
 }
 
-func (u *UseCase) Delete(ctx context.Context, req *payload.DeleteUserRequest) error {
+func (u *UseCase) Delete(ctx context.Context, req *payload.DeleteRequest) error {
 	myUser, err := u.UserRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return myerror.ErrUserNotFound()
+			return myerror.ErrModelNotFound()
 		}
 
-		return myerror.ErrUserGet(err)
+		return myerror.ErrModelGet(err)
 	}
 
 	err = u.UserRepo.Delete(ctx, myUser, false)
 	if err != nil {
-		return myerror.ErrUserDelete(err)
+		return myerror.ErrModelDelete(err)
 	}
 
 	return nil
@@ -157,7 +157,7 @@ func (u *UseCase) Delete(ctx context.Context, req *payload.DeleteUserRequest) er
 
 func (u *UseCase) GetList(
 	ctx context.Context,
-	req *payload.GetListUserRequest,
+	req *payload.GetListRequest,
 ) (*presenter.ListUserResponseWrapper, error) {
 	req.Format()
 
@@ -172,7 +172,7 @@ func (u *UseCase) GetList(
 
 	myUsers, total, err := u.UserRepo.GetList(ctx, req.Search, req.Page, req.Limit, conditions, order)
 	if err != nil {
-		return nil, myerror.ErrUserGet(err)
+		return nil, myerror.ErrModelGet(err)
 	}
 
 	if req.Page == 0 {
@@ -192,10 +192,10 @@ func (u *UseCase) GetByID(ctx context.Context, req *payload.GetByIDRequest) (*pr
 	myUser, err := u.UserRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, myerror.ErrUserNotFound()
+			return nil, myerror.ErrModelNotFound()
 		}
 
-		return nil, myerror.ErrUserGet(err)
+		return nil, myerror.ErrModelGet(err)
 	}
 
 	return &presenter.UserResponseWrapper{User: myUser}, nil
@@ -205,7 +205,7 @@ type UseCase struct {
 	UserRepo user.Repository
 }
 
-func New(repo *repository.Repository) IUseCase {
+func New(repo *repository.Repository) UserUserCase {
 	return &UseCase{
 		UserRepo: repo.User,
 	}

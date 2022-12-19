@@ -1,4 +1,4 @@
-package user
+package card
 
 import (
 	"context"
@@ -8,10 +8,10 @@ import (
 )
 
 type Repository interface {
-	Create(ctx context.Context, data *model.User) error
-	Update(ctx context.Context, data *model.User) error
-	GetByID(ctx context.Context, id int64) (*model.User, error)
-	Delete(ctx context.Context, data *model.User, unscoped bool) error
+	Create(ctx context.Context, data *model.Card) error
+	Update(ctx context.Context, data *model.Card) error
+	GetByID(ctx context.Context, id int64) (*model.Card, error)
+	Delete(ctx context.Context, data *model.Card, unscoped bool) error
 	GetList(
 		ctx context.Context,
 		search string,
@@ -19,7 +19,7 @@ type Repository interface {
 		limit int,
 		conditions interface{},
 		order []string,
-	) ([]model.User, int64, error)
+	) ([]model.Card, int64, error)
 }
 
 func NewPG(getDB func(ctx context.Context) *gorm.DB) Repository {
@@ -30,16 +30,16 @@ type pgRepository struct {
 	getDB func(ctx context.Context) *gorm.DB
 }
 
-func (p *pgRepository) Create(ctx context.Context, data *model.User) error {
+func (p *pgRepository) Create(ctx context.Context, data *model.Card) error {
 	return p.getDB(ctx).Create(data).Error
 }
 
-func (p *pgRepository) Update(ctx context.Context, data *model.User) error {
+func (p *pgRepository) Update(ctx context.Context, data *model.Card) error {
 	return p.getDB(ctx).Save(data).Error
 }
 
-func (p *pgRepository) GetByID(ctx context.Context, id int64) (*model.User, error) {
-	var user model.User
+func (p *pgRepository) GetByID(ctx context.Context, id int64) (*model.Card, error) {
+	var user model.Card
 
 	err := p.getDB(ctx).
 		Where("id = ?", id).
@@ -53,14 +53,14 @@ func (p *pgRepository) GetByID(ctx context.Context, id int64) (*model.User, erro
 	return &user, nil
 }
 
-func (p *pgRepository) Delete(ctx context.Context, data *model.User, unscoped bool) error {
+func (p *pgRepository) Delete(ctx context.Context, data *model.Card, unscoped bool) error {
 	db := p.getDB(ctx)
 
 	if unscoped {
 		db = db.Unscoped()
 	}
 
-	return db.Select("Cards").Delete(data).Error
+	return db.Delete(data).Error
 }
 
 func (p *pgRepository) GetList(
@@ -70,10 +70,10 @@ func (p *pgRepository) GetList(
 	limit int,
 	conditions interface{},
 	order []string,
-) ([]model.User, int64, error) {
+) ([]model.Card, int64, error) {
 	var (
-		db     = p.getDB(ctx).Model(&model.User{}).Preload("Cards")
-		data   = make([]model.User, 0)
+		db     = p.getDB(ctx).Model(&model.Card{}).Preload("User")
+		data   = make([]model.Card, 0)
 		total  int64
 		offset int
 	)
