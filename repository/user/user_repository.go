@@ -72,7 +72,7 @@ func (p *pgRepository) GetList(
 	order []string,
 ) ([]model.User, int64, error) {
 	var (
-		db     = p.getDB(ctx).Model(&model.User{})
+		db     = p.getDB(ctx).Model(&model.User{}).Preload("Cards")
 		data   = make([]model.User, 0)
 		total  int64
 		offset int
