@@ -6,12 +6,12 @@ import (
 	"net/http"
 )
 
-func ErrModelGet(err error) apperror.TeqError {
+func ErrModelGet(err error, modelName string) apperror.TeqError {
 	return apperror.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10000",
-		Message:   "Failed to get card.",
+		Message:   "Failed to get " + modelName,
 		IsSentry:  true,
 	}
 }
@@ -21,7 +21,7 @@ func ErrModelCreate(err error) apperror.TeqError {
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10001",
-		Message:   "Failed to create card.",
+		Message:   "Failed to create record",
 		IsSentry:  true,
 	}
 }
@@ -31,7 +31,7 @@ func ErrModelUpdate(err error) apperror.TeqError {
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10002",
-		Message:   "Failed to update card.",
+		Message:   "Failed to update record",
 		IsSentry:  true,
 	}
 }
@@ -41,7 +41,7 @@ func ErrModelDelete(err error) apperror.TeqError {
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10003",
-		Message:   "Failed to delete card.",
+		Message:   "Failed to delete record",
 		IsSentry:  true,
 	}
 }

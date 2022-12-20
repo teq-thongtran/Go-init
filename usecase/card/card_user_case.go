@@ -10,12 +10,13 @@ import (
 	"myapp/presenter"
 	"myapp/repository"
 	"myapp/repository/card"
+	"myapp/repository/user"
 	"strings"
 
 	"myapp/model"
 )
 
-type CardCardCase interface {
+type CardUseCase interface {
 	Create(ctx context.Context, req *payload.CreateCardRequest) (*presenter.CardResponseWrapper, error)
 	Update(ctx context.Context, req *payload.UpdateCardRequest) (*presenter.CardResponseWrapper, error)
 	GetByID(ctx context.Context, req *payload.GetByIDRequest) (*presenter.CardResponseWrapper, error)
@@ -25,11 +26,13 @@ type CardCardCase interface {
 
 type UseCase struct {
 	CardRepo card.Repository
+	UserRepo user.Repository
 }
 
-func New(repo *repository.Repository) CardCardCase {
+func New(repo *repository.Repository) CardUseCase {
 	return &UseCase{
 		CardRepo: repo.Card,
+		UserRepo: repo.User,
 	}
 }
 
@@ -52,10 +55,6 @@ func (u *UseCase) validateCreate(req *payload.CreateCardRequest) error {
 		return myerror.ErrRequestInvalidParam("card_type")
 	}
 
-	if req.UserId == 0 {
-		return myerror.ErrRequestInvalidParam("user_id")
-	}
-
 	return nil
 }
 
@@ -67,13 +66,19 @@ func (u *UseCase) Create(
 		return nil, err
 	}
 
+	myUser, err := u.UserRepo.GetByID(ctx, req.UserId)
+
+	if err != nil {
+		return nil, myerror.ErrModelGet(err, "User")
+	}
+
 	myCard := &model.Card{
 		NameCard: req.NameCard,
 		CardType: req.CardType,
-		UserId:   req.UserId,
+		UserId:   myUser.ID,
 	}
 
-	err := u.CardRepo.Create(ctx, myCard)
+	err = u.CardRepo.Create(ctx, myCard)
 	if err != nil {
 		return nil, myerror.ErrModelCreate(err)
 	}
@@ -88,7 +93,7 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateCardReq
 			return nil, myerror.ErrModelNotFound()
 		}
 
-		return nil, myerror.ErrModelGet(err)
+		return nil, myerror.ErrModelGet(err, "Card")
 	}
 
 	if req.NameCard != nil {
@@ -109,8 +114,14 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateCardReq
 		myCard.CardType = *req.CardType
 	}
 
-	if req.UserId != 0 {
-		myCard.UserId = req.UserId
+	myUser, err := u.UserRepo.GetByID(ctx, req.UserId)
+
+	if err != nil {
+		return nil, myerror.ErrModelGet(err, "User")
+	}
+
+	if myCard.UserId != myUser.ID {
+		return nil, myerror.ErrRequestInvalidParam("userId")
 	}
 
 	return myCard, nil
@@ -140,7 +151,7 @@ func (u *UseCase) Delete(ctx context.Context, req *payload.DeleteRequest) error 
 			return myerror.ErrModelNotFound()
 		}
 
-		return myerror.ErrModelGet(err)
+		return myerror.ErrModelGet(err, "Card")
 	}
 
 	err = u.CardRepo.Delete(ctx, myCard, false)
@@ -168,7 +179,7 @@ func (u *UseCase) GetList(
 
 	myCards, total, err := u.CardRepo.GetList(ctx, req.Search, req.Page, req.Limit, conditions, order)
 	if err != nil {
-		return nil, myerror.ErrModelGet(err)
+		return nil, myerror.ErrModelGet(err, "Card")
 	}
 
 	if req.Page == 0 {
@@ -191,7 +202,7 @@ func (u *UseCase) GetByID(ctx context.Context, req *payload.GetByIDRequest) (*pr
 			return nil, myerror.ErrModelNotFound()
 		}
 
-		return nil, myerror.ErrModelGet(err)
+		return nil, myerror.ErrModelGet(err, "Card")
 	}
 
 	return &presenter.CardResponseWrapper{Card: myCard}, nil

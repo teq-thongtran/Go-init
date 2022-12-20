@@ -22,7 +22,6 @@ func NewHTTPHandler(useCase *usecase.UseCase) *echo.Echo {
 		return c.Request().URL.Path == "/health-check"
 	}
 
-	e.Use(middleware.LoggerWithConfig(loggerCfg))
 	e.Use(middleware.Recover())
 	e.Pre(middleware.RemoveTrailingSlash())
 
@@ -39,10 +38,14 @@ func NewHTTPHandler(useCase *usecase.UseCase) *echo.Echo {
 			http.MethodPost, http.MethodDelete, http.MethodOptions,
 		},
 	}))
+	e.Use(middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
+		return key == "valid-key", nil
+	}))
 
 	// APIs
 	api := e.Group("/api")
+	userApi := api.Group("/users/:user_id")
 	user.Init(api.Group("/users"), useCase)
-	card.Init(api.Group("/cards"), useCase)
+	card.Init(userApi.Group("/cards"), useCase)
 	return e
 }
