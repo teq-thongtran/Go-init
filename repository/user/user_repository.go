@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-
 	"gorm.io/gorm"
 	"myapp/model"
 )
@@ -42,6 +41,7 @@ func (p *pgRepository) GetByID(ctx context.Context, id int64) (*model.User, erro
 	var user model.User
 
 	err := p.getDB(ctx).
+		Debug().
 		Where("id = ?", id).
 		First(&user).
 		Error
@@ -72,7 +72,7 @@ func (p *pgRepository) GetList(
 	order []string,
 ) ([]model.User, int64, error) {
 	var (
-		db     = p.getDB(ctx).Model(&model.User{}).Preload("Cards")
+		db     = p.getDB(ctx).Debug().Model(&model.User{}).Preload("Cards")
 		data   = make([]model.User, 0)
 		total  int64
 		offset int

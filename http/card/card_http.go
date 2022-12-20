@@ -27,16 +27,19 @@ func Init(group *echo.Group, useCase *usecase.UseCase) {
 
 func (r *Route) Create(c echo.Context) error {
 	var (
-		ctx  = &teq.CustomEchoContext{Context: c}
-		req  = payload.CreateCardRequest{}
-		resp *presenter.CardResponseWrapper
+		ctx       = &teq.CustomEchoContext{Context: c}
+		resp      *presenter.CardResponseWrapper
+		req       = payload.CreateCardRequest{}
+		userIdStr = c.Param("user_id")
 	)
 
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+	req.UserId = userId
 	if err := c.Bind(&req); err != nil {
 		return teq.Response.Error(ctx, myerror.ErrInvalidParams(err))
 	}
 
-	resp, err := r.UseCase.Card.Create(ctx, &req)
+	resp, err = r.UseCase.Card.Create(ctx, &req)
 	if err != nil {
 		return teq.Response.Error(c, err.(apperror.TeqError))
 	}
@@ -84,18 +87,22 @@ func (r *Route) GetList(c echo.Context) error {
 
 func (r *Route) Update(c echo.Context) error {
 	var (
-		ctx   = &teq.CustomEchoContext{Context: c}
-		idStr = c.Param("id")
-		resp  *presenter.CardResponseWrapper
+		ctx       = &teq.CustomEchoContext{Context: c}
+		idStr     = c.Param("id")
+		resp      *presenter.CardResponseWrapper
+		userIdStr = c.Param("user_id")
 	)
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+
 	if err != nil {
 		return teq.Response.Error(ctx, myerror.ErrInvalidParams(err))
 	}
 
 	req := payload.UpdateCardRequest{
-		ID: id,
+		ID:     id,
+		UserId: userId,
 	}
 
 	if err = c.Bind(&req); err != nil {

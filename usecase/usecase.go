@@ -8,7 +8,7 @@ import (
 
 type UseCase struct {
 	User user.UserUserCase
-	Card card.CardCardCase
+	Card card.CardUseCase
 }
 
 func New(repo *repository.Repository) *UseCase {

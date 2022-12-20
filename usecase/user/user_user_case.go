@@ -83,7 +83,7 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateUserReq
 			return nil, myerror.ErrModelNotFound()
 		}
 
-		return nil, myerror.ErrModelGet(err)
+		return nil, myerror.ErrModelGet(err, "User")
 	}
 
 	if req.Name != nil {
@@ -144,7 +144,7 @@ func (u *UseCase) Delete(ctx context.Context, req *payload.DeleteRequest) error 
 			return myerror.ErrModelNotFound()
 		}
 
-		return myerror.ErrModelGet(err)
+		return myerror.ErrModelGet(err, "User")
 	}
 
 	err = u.UserRepo.Delete(ctx, myUser, false)
@@ -172,7 +172,7 @@ func (u *UseCase) GetList(
 
 	myUsers, total, err := u.UserRepo.GetList(ctx, req.Search, req.Page, req.Limit, conditions, order)
 	if err != nil {
-		return nil, myerror.ErrModelGet(err)
+		return nil, myerror.ErrModelGet(err, "User")
 	}
 
 	if req.Page == 0 {
@@ -195,7 +195,7 @@ func (u *UseCase) GetByID(ctx context.Context, req *payload.GetByIDRequest) (*pr
 			return nil, myerror.ErrModelNotFound()
 		}
 
-		return nil, myerror.ErrModelGet(err)
+		return nil, myerror.ErrModelGet(err, "User")
 	}
 
 	return &presenter.UserResponseWrapper{User: myUser}, nil
