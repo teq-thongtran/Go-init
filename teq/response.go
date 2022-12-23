@@ -1,7 +1,7 @@
 package teq
 
 import (
-	"myapp/apperror"
+	"myapp/appError"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -19,7 +19,7 @@ func (response) Success(c echo.Context, data interface{}) error {
 	})
 }
 
-func (response) Error(c echo.Context, err apperror.TeqError) error {
+func (response) Error(c echo.Context, err appError.TeqError) error {
 	var errMessage string
 
 	if err.Raw != nil {

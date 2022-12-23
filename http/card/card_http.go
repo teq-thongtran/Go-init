@@ -2,8 +2,8 @@ package card
 
 import (
 	"github.com/labstack/echo/v4"
-	"myapp/apperror"
-	"myapp/myerror"
+	"myapp/appError"
+	"myapp/customError"
 	"myapp/payload"
 	"myapp/presenter"
 	"myapp/teq"
@@ -17,7 +17,6 @@ type Route struct {
 
 func Init(group *echo.Group, useCase *usecase.UseCase) {
 	r := &Route{UseCase: useCase}
-
 	group.POST("", r.Create)
 	group.GET("", r.GetList)
 	group.GET("/:id", r.GetByID)
@@ -36,12 +35,12 @@ func (r *Route) Create(c echo.Context) error {
 	userId, err := strconv.ParseInt(userIdStr, 10, 64)
 	req.UserId = userId
 	if err := c.Bind(&req); err != nil {
-		return teq.Response.Error(ctx, myerror.ErrInvalidParams(err))
+		return teq.Response.Error(ctx, customError.ErrInvalidParams(err))
 	}
 
 	resp, err = r.UseCase.Card.Create(ctx, &req)
 	if err != nil {
-		return teq.Response.Error(c, err.(apperror.TeqError))
+		return teq.Response.Error(c, err.(appError.TeqError))
 	}
 
 	return teq.Response.Success(c, resp)
@@ -55,12 +54,12 @@ func (r *Route) Delete(c echo.Context) error {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		return teq.Response.Error(ctx, myerror.ErrInvalidParams(err))
+		return teq.Response.Error(ctx, customError.ErrInvalidParams(err))
 	}
 
 	err = r.UseCase.Card.Delete(ctx, &payload.DeleteRequest{ID: id})
 	if err != nil {
-		return teq.Response.Error(c, err.(apperror.TeqError))
+		return teq.Response.Error(c, err.(appError.TeqError))
 	}
 
 	return teq.Response.Success(c, nil)
@@ -74,12 +73,12 @@ func (r *Route) GetList(c echo.Context) error {
 	)
 
 	if err := c.Bind(&req); err != nil {
-		return teq.Response.Error(ctx, myerror.ErrInvalidParams(err))
+		return teq.Response.Error(ctx, customError.ErrInvalidParams(err))
 	}
 
 	resp, err := r.UseCase.Card.GetList(ctx, &req)
 	if err != nil {
-		return teq.Response.Error(c, err.(apperror.TeqError))
+		return teq.Response.Error(c, err.(appError.TeqError))
 	}
 
 	return teq.Response.Success(c, resp)
@@ -97,7 +96,7 @@ func (r *Route) Update(c echo.Context) error {
 	userId, err := strconv.ParseInt(userIdStr, 10, 64)
 
 	if err != nil {
-		return teq.Response.Error(ctx, myerror.ErrInvalidParams(err))
+		return teq.Response.Error(ctx, customError.ErrInvalidParams(err))
 	}
 
 	req := payload.UpdateCardRequest{
@@ -106,12 +105,12 @@ func (r *Route) Update(c echo.Context) error {
 	}
 
 	if err = c.Bind(&req); err != nil {
-		return teq.Response.Error(ctx, myerror.ErrInvalidParams(err))
+		return teq.Response.Error(ctx, customError.ErrInvalidParams(err))
 	}
 
 	resp, err = r.UseCase.Card.Update(ctx, &req)
 	if err != nil {
-		return teq.Response.Error(c, err.(apperror.TeqError))
+		return teq.Response.Error(c, err.(appError.TeqError))
 	}
 
 	return teq.Response.Success(c, resp)
@@ -126,12 +125,12 @@ func (r *Route) GetByID(c echo.Context) error {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		return teq.Response.Error(ctx, myerror.ErrInvalidParams(err))
+		return teq.Response.Error(ctx, customError.ErrInvalidParams(err))
 	}
 
 	resp, err = r.UseCase.Card.GetByID(ctx, &payload.GetByIDRequest{ID: id})
 	if err != nil {
-		return teq.Response.Error(c, err.(apperror.TeqError))
+		return teq.Response.Error(c, err.(appError.TeqError))
 	}
 
 	return teq.Response.Success(c, resp)

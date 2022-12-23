@@ -1,13 +1,13 @@
-package myerror
+package customError
 
 import (
 	"fmt"
-	"myapp/apperror"
+	"myapp/appError"
 	"net/http"
 )
 
-func ErrModelGet(err error, modelName string) apperror.TeqError {
-	return apperror.TeqError{
+func ErrModelGet(err error, modelName string) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10000",
@@ -16,8 +16,8 @@ func ErrModelGet(err error, modelName string) apperror.TeqError {
 	}
 }
 
-func ErrModelCreate(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrModelCreate(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10001",
@@ -26,8 +26,8 @@ func ErrModelCreate(err error) apperror.TeqError {
 	}
 }
 
-func ErrModelUpdate(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrModelUpdate(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10002",
@@ -36,8 +36,8 @@ func ErrModelUpdate(err error) apperror.TeqError {
 	}
 }
 
-func ErrModelDelete(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrModelDelete(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "10003",
@@ -46,8 +46,8 @@ func ErrModelDelete(err error) apperror.TeqError {
 	}
 }
 
-func ErrModelNotFound() apperror.TeqError {
-	return apperror.TeqError{
+func ErrModelNotFound() appError.TeqError {
+	return appError.TeqError{
 		Raw:       nil,
 		HTTPCode:  http.StatusNotFound,
 		ErrorCode: "10004",
@@ -56,8 +56,8 @@ func ErrModelNotFound() apperror.TeqError {
 	}
 }
 
-func ErrRequestInvalidParam(param string) apperror.TeqError {
-	return apperror.TeqError{
+func ErrRequestInvalidParam(param string) appError.TeqError {
+	return appError.TeqError{
 		Raw:       nil,
 		HTTPCode:  http.StatusBadRequest,
 		ErrorCode: "10005",
@@ -66,8 +66,8 @@ func ErrRequestInvalidParam(param string) apperror.TeqError {
 	}
 }
 
-func ErrCommitTransaction(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrCommitTransaction(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "002",
@@ -76,8 +76,8 @@ func ErrCommitTransaction(err error) apperror.TeqError {
 	}
 }
 
-func ErrUnauthorized(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrUnauthorized(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusUnauthorized,
 		ErrorCode: "000001",
@@ -86,8 +86,8 @@ func ErrUnauthorized(err error) apperror.TeqError {
 	}
 }
 
-func ErrNoPermission() apperror.TeqError {
-	return apperror.TeqError{
+func ErrNoPermission() appError.TeqError {
+	return appError.TeqError{
 		Raw:       nil,
 		HTTPCode:  http.StatusForbidden,
 		ErrorCode: "000002",
@@ -96,8 +96,8 @@ func ErrNoPermission() apperror.TeqError {
 	}
 }
 
-func ErrInvalidParams(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrInvalidParams(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusBadRequest,
 		ErrorCode: "000003",
@@ -106,8 +106,8 @@ func ErrInvalidParams(err error) apperror.TeqError {
 	}
 }
 
-func ErrNotFound(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrNotFound(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusNotFound,
 		ErrorCode: "000004",
@@ -116,8 +116,8 @@ func ErrNotFound(err error) apperror.TeqError {
 	}
 }
 
-func ErrGet(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrGet(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "000005",
@@ -126,8 +126,8 @@ func ErrGet(err error) apperror.TeqError {
 	}
 }
 
-func ErrCreate(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrCreate(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "000006",
@@ -136,8 +136,8 @@ func ErrCreate(err error) apperror.TeqError {
 	}
 }
 
-func ErrUpdate(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrUpdate(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "000007",
@@ -146,12 +146,22 @@ func ErrUpdate(err error) apperror.TeqError {
 	}
 }
 
-func ErrDelete(err error) apperror.TeqError {
-	return apperror.TeqError{
+func ErrDelete(err error) appError.TeqError {
+	return appError.TeqError{
 		Raw:       err,
 		HTTPCode:  http.StatusInternalServerError,
 		ErrorCode: "000008",
 		Message:   "Failed to delete.",
 		IsSentry:  true,
+	}
+}
+
+func ErrTokenExpired(err error) appError.TeqError {
+	return appError.TeqError{
+		Raw:       err,
+		HTTPCode:  http.StatusInternalServerError,
+		ErrorCode: "000009",
+		Message:   "Token Expired!",
+		IsSentry:  false,
 	}
 }

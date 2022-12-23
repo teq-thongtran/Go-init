@@ -2,17 +2,23 @@ package http
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"myapp/auth"
+	"myapp/http/appSession"
+	"myapp/repository"
 	"net/http"
 	"regexp"
-
-	"github.com/labstack/echo/v4/middleware"
 
 	"myapp/http/card"
 	"myapp/http/user"
 	"myapp/usecase"
 )
 
-func NewHTTPHandler(useCase *usecase.UseCase) *echo.Echo {
+type Route struct {
+	UseCase *usecase.UseCase
+}
+
+func NewHTTPHandler(useCase *usecase.UseCase, repo *repository.Repository) *echo.Echo {
 	var (
 		e         = echo.New()
 		loggerCfg = middleware.DefaultLoggerConfig
@@ -38,14 +44,16 @@ func NewHTTPHandler(useCase *usecase.UseCase) *echo.Echo {
 			http.MethodPost, http.MethodDelete, http.MethodOptions,
 		},
 	}))
-	e.Use(middleware.KeyAuth(func(key string, c echo.Context) (bool, error) {
-		return key == "valid-key", nil
-	}))
 
 	// APIs
 	api := e.Group("/api")
-	userApi := api.Group("/users/:user_id")
-	user.Init(api.Group("/users"), useCase)
-	card.Init(userApi.Group("/cards"), useCase)
+	middlewares := auth.NewMiddlewareManager(repo.User)
+	userApi := api.Group("/users", middlewares.RequiredAuth)
+	cardApi := api.Group("/cards", middlewares.RequiredAuth)
+
+	// Init groups APIs
+	appSession.Init(api.Group("/session"), useCase)
+	user.Init(userApi.Group(""), useCase)
+	card.Init(cardApi.Group(""), useCase)
 	return e
 }

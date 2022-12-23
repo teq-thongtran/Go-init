@@ -41,8 +41,8 @@ func (p *pgRepository) Update(ctx context.Context, data *model.Card) error {
 func (p *pgRepository) GetByID(ctx context.Context, id int64) (*model.Card, error) {
 	var user model.Card
 
-	err := p.getDB(ctx).
-		Where("id = ?", id).
+	err := p.getDB(ctx).Debug().
+		Where("id = ? AND user_id = ?", id, ctx.Value("user_id")).
 		First(&user).
 		Error
 
@@ -72,7 +72,7 @@ func (p *pgRepository) GetList(
 	order []string,
 ) ([]model.Card, int64, error) {
 	var (
-		db     = p.getDB(ctx).Model(&model.Card{}).Preload("User")
+		db     = p.getDB(ctx).Model(&model.Card{}).Debug().Preload("User")
 		data   = make([]model.Card, 0)
 		total  int64
 		offset int

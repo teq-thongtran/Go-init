@@ -31,3 +31,8 @@ func (g *GetListRequest) Format() {
 type DeleteRequest struct {
 	ID int64 `json:"-"`
 }
+
+type SignInRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
