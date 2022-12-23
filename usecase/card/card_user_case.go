@@ -89,10 +89,6 @@ func (u *UseCase) Create(
 func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateCardRequest) (*model.Card, error) {
 	myCard, err := u.CardRepo.GetByID(ctx, req.ID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, customError.ErrModelNotFound()
-		}
-
 		return nil, customError.ErrModelGet(err, "Card")
 	}
 
@@ -147,10 +143,6 @@ func (u *UseCase) Update(
 func (u *UseCase) Delete(ctx context.Context, req *payload.DeleteRequest) error {
 	myCard, err := u.CardRepo.GetByID(ctx, req.ID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return customError.ErrModelNotFound()
-		}
-
 		return customError.ErrModelGet(err, "Card")
 	}
 

@@ -35,7 +35,7 @@ func (p *pgRepository) Create(ctx context.Context, data *model.User) error {
 }
 
 func (p *pgRepository) Update(ctx context.Context, data *model.User) error {
-	return p.getDB(ctx).Save(data).Error
+	return p.getDB(ctx).Debug().Save(data).Error
 }
 
 func (p *pgRepository) GetByID(ctx context.Context, id int64) (*model.User, error) {
@@ -77,7 +77,7 @@ func (p *pgRepository) Delete(ctx context.Context, data *model.User, unscoped bo
 		db = db.Unscoped()
 	}
 
-	return db.Select("Cards").Delete(data).Error
+	return db.Select("Cards").Debug().Delete(data).Error
 }
 
 func (p *pgRepository) GetList(
