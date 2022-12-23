@@ -10,6 +10,7 @@ type Repository interface {
 	Create(ctx context.Context, data *model.User) error
 	Update(ctx context.Context, data *model.User) error
 	GetByID(ctx context.Context, id int64) (*model.User, error)
+	GetByUsername(ctx context.Context, username string) (*model.User, error)
 	Delete(ctx context.Context, data *model.User, unscoped bool) error
 	GetList(
 		ctx context.Context,
@@ -43,6 +44,22 @@ func (p *pgRepository) GetByID(ctx context.Context, id int64) (*model.User, erro
 	err := p.getDB(ctx).
 		Debug().
 		Where("id = ?", id).
+		First(&user).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (p *pgRepository) GetByUsername(ctx context.Context, username string) (*model.User, error) {
+	var user model.User
+
+	err := p.getDB(ctx).
+		Debug().
+		Where("username = ?", username).
 		First(&user).
 		Error
 

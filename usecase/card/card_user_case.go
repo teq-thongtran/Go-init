@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
-	"myapp/myerror"
+	"myapp/customError"
 	"myapp/payload"
 	"myapp/presenter"
 	"myapp/repository"
@@ -38,21 +38,21 @@ func New(repo *repository.Repository) CardUseCase {
 
 func (u *UseCase) validateCreate(req *payload.CreateCardRequest) error {
 	if req.NameCard == "" {
-		return myerror.ErrRequestInvalidParam("name_card")
+		return customError.ErrRequestInvalidParam("name_card")
 	}
 
 	if req.CardType == "" {
-		return myerror.ErrRequestInvalidParam("card_type")
+		return customError.ErrRequestInvalidParam("card_type")
 	}
 
 	req.NameCard = strings.TrimSpace(req.NameCard)
 	if len(req.NameCard) == 0 {
 		req.NameCard = ""
-		return myerror.ErrRequestInvalidParam("name_card")
+		return customError.ErrRequestInvalidParam("name_card")
 	}
 
 	if len(req.CardType) == 0 {
-		return myerror.ErrRequestInvalidParam("card_type")
+		return customError.ErrRequestInvalidParam("card_type")
 	}
 
 	return nil
@@ -69,7 +69,7 @@ func (u *UseCase) Create(
 	myUser, err := u.UserRepo.GetByID(ctx, req.UserId)
 
 	if err != nil {
-		return nil, myerror.ErrModelGet(err, "User")
+		return nil, customError.ErrModelGet(err, "User")
 	}
 
 	myCard := &model.Card{
@@ -80,7 +80,7 @@ func (u *UseCase) Create(
 
 	err = u.CardRepo.Create(ctx, myCard)
 	if err != nil {
-		return nil, myerror.ErrModelCreate(err)
+		return nil, customError.ErrModelCreate(err)
 	}
 
 	return &presenter.CardResponseWrapper{Card: myCard}, nil
@@ -90,16 +90,16 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateCardReq
 	myCard, err := u.CardRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, myerror.ErrModelNotFound()
+			return nil, customError.ErrModelNotFound()
 		}
 
-		return nil, myerror.ErrModelGet(err, "Card")
+		return nil, customError.ErrModelGet(err, "Card")
 	}
 
 	if req.NameCard != nil {
 		*req.NameCard = strings.TrimSpace(*req.NameCard)
 		if len(*req.NameCard) == 0 {
-			return nil, myerror.ErrRequestInvalidParam("name")
+			return nil, customError.ErrRequestInvalidParam("name")
 		}
 
 		myCard.NameCard = *req.NameCard
@@ -108,7 +108,7 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateCardReq
 	if req.CardType != nil {
 		*req.CardType = strings.TrimSpace(*req.CardType)
 		if len(*req.CardType) == 0 {
-			return nil, myerror.ErrRequestInvalidParam("Cardname")
+			return nil, customError.ErrRequestInvalidParam("Cardname")
 		}
 
 		myCard.CardType = *req.CardType
@@ -117,11 +117,11 @@ func (u *UseCase) validateUpdate(ctx context.Context, req *payload.UpdateCardReq
 	myUser, err := u.UserRepo.GetByID(ctx, req.UserId)
 
 	if err != nil {
-		return nil, myerror.ErrModelGet(err, "User")
+		return nil, customError.ErrModelGet(err, "User")
 	}
 
 	if myCard.UserId != myUser.ID {
-		return nil, myerror.ErrRequestInvalidParam("userId")
+		return nil, customError.ErrRequestInvalidParam("userId")
 	}
 
 	return myCard, nil
@@ -138,7 +138,7 @@ func (u *UseCase) Update(
 
 	err = u.CardRepo.Update(ctx, myCard)
 	if err != nil {
-		return nil, myerror.ErrModelUpdate(err)
+		return nil, customError.ErrModelUpdate(err)
 	}
 
 	return &presenter.CardResponseWrapper{Card: myCard}, nil
@@ -148,15 +148,15 @@ func (u *UseCase) Delete(ctx context.Context, req *payload.DeleteRequest) error 
 	myCard, err := u.CardRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return myerror.ErrModelNotFound()
+			return customError.ErrModelNotFound()
 		}
 
-		return myerror.ErrModelGet(err, "Card")
+		return customError.ErrModelGet(err, "Card")
 	}
 
 	err = u.CardRepo.Delete(ctx, myCard, false)
 	if err != nil {
-		return myerror.ErrModelDelete(err)
+		return customError.ErrModelDelete(err)
 	}
 
 	return nil
@@ -176,10 +176,10 @@ func (u *UseCase) GetList(
 	if req.OrderBy != "" {
 		order = append(order, fmt.Sprintf("%s", req.OrderBy))
 	}
-
+	conditions["user_id"] = ctx.Value("user_id")
 	myCards, total, err := u.CardRepo.GetList(ctx, req.Search, req.Page, req.Limit, conditions, order)
 	if err != nil {
-		return nil, myerror.ErrModelGet(err, "Card")
+		return nil, customError.ErrModelGet(err, "Card")
 	}
 
 	if req.Page == 0 {
@@ -199,10 +199,10 @@ func (u *UseCase) GetByID(ctx context.Context, req *payload.GetByIDRequest) (*pr
 	myCard, err := u.CardRepo.GetByID(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, myerror.ErrModelNotFound()
+			return nil, customError.ErrModelNotFound()
 		}
 
-		return nil, myerror.ErrModelGet(err, "Card")
+		return nil, customError.ErrModelGet(err, "Card")
 	}
 
 	return &presenter.CardResponseWrapper{Card: myCard}, nil

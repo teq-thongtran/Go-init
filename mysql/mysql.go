@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	"myapp/config"
-	"myapp/myerror"
+	"myapp/customError"
 )
 
 type KeyContext string
@@ -54,7 +54,7 @@ func TxEnd(ctx context.Context, txFunc func(context.Context) error) (context.Con
 					err = tx.Commit().Error // if Commit returns error update err with commit err
 					if err != nil {
 						tx.Logger.Error(ctx, "fail commit transaction", err)
-						err = myerror.ErrCommitTransaction(err)
+						err = customError.ErrCommitTransaction(err)
 					}
 				}
 			}()

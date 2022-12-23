@@ -44,13 +44,13 @@ func main() {
 
 	switch *taskPtr {
 	case "server":
-		executeServer(useCase, client)
+		executeServer(useCase, repo, client)
 	default:
-		executeServer(useCase, client)
+		executeServer(useCase, repo, client)
 	}
 }
 
-func executeServer(useCase *usecase.UseCase, client func(ctx context.Context) *gorm.DB) {
+func executeServer(useCase *usecase.UseCase, repo *repository.Repository, client func(ctx context.Context) *gorm.DB) {
 	cfg := config.GetConfig()
 
 	// migration
@@ -67,7 +67,7 @@ func executeServer(useCase *usecase.UseCase, client func(ctx context.Context) *g
 
 	// http
 	{
-		h := serviceHttp.NewHTTPHandler(useCase)
+		h := serviceHttp.NewHTTPHandler(useCase, repo)
 		go func() {
 			h.Listener = httpL
 			errs <- h.Start("")
